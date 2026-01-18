@@ -1,0 +1,75 @@
+import type { Metadata } from 'next';
+import { Poppins, Open_Sans } from 'next/font/google';
+import './globals.css';
+
+const poppins = Poppins({
+  weight: ['400', '500', '600', '700'],
+  subsets: ['latin'],
+  variable: '--font-poppins',
+  display: 'swap',
+});
+
+const openSans = Open_Sans({
+  weight: ['300', '400', '500', '600', '700'],
+  subsets: ['latin'],
+  variable: '--font-open-sans',
+  display: 'swap',
+});
+
+export const metadata: Metadata = {
+  title: 'PredictLearn - Master Prediction Markets',
+  description: 'Master prediction markets with real Polymarket data and AI-powered insights. Learn to predict with confidence.',
+  keywords: ['prediction markets', 'polymarket', 'trading education', 'market analysis', 'predictlearn'],
+  authors: [{ name: 'PredictLearn' }],
+  openGraph: {
+    title: 'PredictLearn - Master Prediction Markets',
+    description: 'Master prediction markets with real Polymarket data and AI-powered insights',
+    url: 'https://github.com/jirassssa/PredictLearn',
+    siteName: 'PredictLearn',
+    locale: 'en_US',
+    type: 'website',
+  },
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en" className={`${poppins.variable} ${openSans.variable}`}>
+      <body className="antialiased min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-slate-950 dark:to-indigo-950 font-body">
+        <div className="min-h-screen">
+          <header className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-indigo-100 dark:border-gray-800 sticky top-0 z-50 shadow-sm">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+              <div className="flex items-center justify-between">
+                <a href="/landing" className="flex items-center space-x-4 cursor-pointer group">
+                  <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-200">
+                    <span className="text-2xl">📊</span>
+                  </div>
+                  <div>
+                    <h1 className="text-xl font-heading font-bold text-gray-900 dark:text-white">
+                      PredictLearn
+                    </h1>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                      Master prediction markets with real data
+                    </p>
+                  </div>
+                </a>
+                <div className="flex items-center space-x-4">
+                  <a href="/" className="text-sm font-heading font-semibold text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer">
+                    Dashboard
+                  </a>
+                  <div className="text-sm text-gray-700 dark:text-gray-300 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950 dark:to-purple-950 px-4 py-2 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                    <span className="font-heading font-semibold">Level 12</span> • <span>7🔥</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </header>
+          <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">{children}</main>
+        </div>
+      </body>
+    </html>
+  );
+}
