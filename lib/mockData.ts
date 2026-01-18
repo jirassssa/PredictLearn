@@ -126,10 +126,10 @@ export const mockPrediction: Prediction = {
       description: '15 articles, neutral tone',
     },
     {
-      signalType: 'onchain',
+      signalType: 'twitter',
       impact: -5,
       value: 42,
-      description: 'Network activity declining',
+      description: 'Social sentiment declining',
     },
     {
       signalType: 'volume',
@@ -230,7 +230,7 @@ export const mockAnalysts: Analyst[] = [
       { signalType: 'whales', weight: 35 },
       { signalType: 'volume', weight: 25 },
       { signalType: 'twitter', weight: 20 },
-      { signalType: 'onchain', weight: 20 },
+      { signalType: 'news', weight: 20 },
     ],
     followers: 2340,
     verified: true,

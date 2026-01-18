@@ -178,7 +178,7 @@ function calculateCategoryBreakdown(
 
   return categories.map((category) => {
     const categoryMarkets = markets.filter((m) =>
-      matchesCategory(m.category, category)
+      matchesCategory(m.category || '', category)
     );
 
     const correct = categoryMarkets.filter((m) => hasStrongOutcome(m)).length;

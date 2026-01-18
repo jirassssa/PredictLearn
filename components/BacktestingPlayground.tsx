@@ -13,7 +13,7 @@ export default function BacktestingPlayground() {
   const [timeRange, setTimeRange] = useState('6months');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  const availableSignals: SignalType[] = ['twitter', 'whales', 'news', 'volume', 'reddit', 'onchain'];
+  const availableSignals: SignalType[] = ['twitter', 'whales', 'news', 'volume'];
 
   const profitOverTime = result.trades.map((trade, i) => ({
     index: i + 1,

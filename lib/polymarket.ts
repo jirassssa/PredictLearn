@@ -30,13 +30,14 @@ export interface PolymarketMarket {
   slug: string;
   outcomes: string[];
   outcomePrices: string[];
-  volume: string;
-  liquidity: string;
+  volume: number;
+  liquidity: number;
   active: boolean;
   closed: boolean;
   acceptingOrders: boolean;
   enableOrderBook: boolean;
   tags: string[];
+  category?: string;
 }
 
 export interface PolymarketPrice {

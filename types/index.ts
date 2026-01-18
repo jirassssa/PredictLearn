@@ -1,5 +1,5 @@
 // Signal Types
-export type SignalType = 'twitter' | 'whales' | 'news' | 'volume' | 'reddit' | 'onchain';
+export type SignalType = 'twitter' | 'whales' | 'news' | 'volume';
 
 export interface SignalPerformance {
   signalType: SignalType;
