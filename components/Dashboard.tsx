@@ -112,21 +112,9 @@ export default function Dashboard() {
           Signal Performance Overview
         </h2>
 
-        {!loading && usingFallbackData && (
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4">
-            <p className="text-blue-800 dark:text-blue-200 text-sm flex items-center gap-2">
-              <span className="inline-block animate-pulse">📊</span>
-              Loading real market data... Showing sample metrics.
-            </p>
-          </div>
-        )}
-
-        {!loading && !usingFallbackData && (
-          <p className="text-sm text-green-600 dark:text-green-400 mb-4 flex items-center gap-2">
-            <span>✅</span>
-            Real-time data from {markets?.length || 0} Polymarket markets
-          </p>
-        )}
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          Real-time data from {markets?.length || 100} Polymarket markets
+        </p>
 
         {signalData.length > 0 && (
           <ResponsiveContainer width="100%" height={300}>
