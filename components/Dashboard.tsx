@@ -1,14 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { mockUserProgress } from '@/lib/mockData';
 import { useMarkets } from '@/hooks/usePolymarket';
 import { computeSignalPerformance, getBestSignal } from '@/lib/signalCalculator';
 import { SignalPerformance } from '@/types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useUserData } from '@/contexts/UserDataContext';
+import { useAccount } from 'wagmi';
 
 export default function Dashboard() {
   const [selectedBadge, setSelectedBadge] = useState<string | null>(null);
+  const { progress } = useUserData();
+  const { isConnected } = useAccount();
 
   // Start with fallback data immediately (optimistic loading)
   const [signals, setSignals] = useState<SignalPerformance[]>(() =>
@@ -21,7 +24,6 @@ export default function Dashboard() {
     { refreshInterval: 60000 }
   );
 
-  const progress = mockUserProgress;
   const xpProgress = (progress.xp / progress.xpToNextLevel) * 100;
 
   // Update with real data when available
@@ -43,10 +45,39 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Wallet Status Banner */}
+      {!isConnected && (
+        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg p-4 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-bold text-lg mb-1">🔒 Connect Your Wallet</h3>
+              <p className="text-sm text-white/90">
+                Connect your wallet to save your progress and compete on the leaderboard!
+              </p>
+            </div>
+            <div className="text-5xl opacity-50">👛</div>
+          </div>
+        </div>
+      )}
+
+      {isConnected && (
+        <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg p-4 text-white">
+          <div className="flex items-center gap-3">
+            <div className="text-2xl">✅</div>
+            <div>
+              <h3 className="font-bold">Wallet Connected</h3>
+              <p className="text-sm text-white/90">
+                Your progress is automatically saved to address: {progress.userId.slice(0, 6)}...{progress.userId.slice(-4)}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* User Progress Card */}
       <div className="card p-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-          Your Progress
+          Your Progress {!isConnected && <span className="text-sm text-gray-500">(Guest Mode)</span>}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="space-y-2 group relative">

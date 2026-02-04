@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Poppins, Open_Sans } from 'next/font/google';
 import './globals.css';
+import { Providers } from '@/components/Providers';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 const poppins = Poppins({
   weight: ['400', '500', '600', '700'],
@@ -39,7 +41,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${poppins.variable} ${openSans.variable}`}>
       <body className="antialiased min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-slate-950 dark:to-indigo-950 font-body">
-        <div className="min-h-screen">
+        <Providers>
+          <div className="min-h-screen">
           <header className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-indigo-100 dark:border-gray-800 sticky top-0 z-50 shadow-sm">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
               <div className="flex items-center justify-between">
@@ -60,15 +63,14 @@ export default function RootLayout({
                   <a href="/" className="text-sm font-heading font-semibold text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer">
                     Dashboard
                   </a>
-                  <div className="text-sm text-gray-700 dark:text-gray-300 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950 dark:to-purple-950 px-4 py-2 rounded-lg border border-indigo-200 dark:border-indigo-800">
-                    <span className="font-heading font-semibold">Level 12</span> • <span>7🔥</span>
-                  </div>
+                  <ConnectButton />
                 </div>
               </div>
             </div>
           </header>
           <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">{children}</main>
         </div>
+        </Providers>
       </body>
     </html>
   );
