@@ -199,7 +199,7 @@ function simulateTrade(
     entryOdds: Math.round(entryOdds * 100) / 100,
     exitOdds: Math.round(exitOdds * 100) / 100,
     profit: Math.round(profit * 10) / 10,
-    timestamp: market.createdAt || new Date().toISOString(),
+    timestamp: new Date().toISOString(),
     signals: firedSignals
   };
 }

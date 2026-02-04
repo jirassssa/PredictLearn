@@ -147,6 +147,7 @@ export const mockBacktestResult: BacktestResult = {
   profitableTrades: 31,
   winRate: 68.9,
   averageProfit: 12.3,
+  totalProfit: 381.3,
   bestTrade: 34,
   worstTrade: -8,
   sharpeRatio: 1.8,
