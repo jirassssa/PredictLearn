@@ -9,8 +9,12 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 
 export default function Dashboard() {
   const [selectedBadge, setSelectedBadge] = useState<string | null>(null);
-  const [signals, setSignals] = useState<SignalPerformance[]>([]);
-  const [usingFallbackData, setUsingFallbackData] = useState(false);
+
+  // Start with fallback data immediately (optimistic loading)
+  const [signals, setSignals] = useState<SignalPerformance[]>(() =>
+    computeSignalPerformance([])
+  );
+  const [usingFallbackData, setUsingFallbackData] = useState(true);
 
   const { data: markets, loading, error } = useMarkets(
     { limit: 100, closed: true },
@@ -20,34 +24,14 @@ export default function Dashboard() {
   const progress = mockUserProgress;
   const xpProgress = (progress.xp / progress.xpToNextLevel) * 100;
 
+  // Update with real data when available
   useEffect(() => {
     if (markets && markets.length > 0) {
       const calculatedSignals = computeSignalPerformance(markets);
       setSignals(calculatedSignals);
       setUsingFallbackData(false);
-    } else if (error) {
-      // Use default signals as fallback when API fails
-      const calculatedSignals = computeSignalPerformance([]);
-      setSignals(calculatedSignals);
-      setUsingFallbackData(true);
     }
-  }, [markets, error]);
-
-  // Use fallback data after loading for too long (15 seconds)
-  useEffect(() => {
-    if (loading) {
-      const timeout = setTimeout(() => {
-        setSignals((currentSignals) => {
-          if (currentSignals.length === 0) {
-            setUsingFallbackData(true);
-            return computeSignalPerformance([]);
-          }
-          return currentSignals;
-        });
-      }, 15000);
-      return () => clearTimeout(timeout);
-    }
-  }, [loading]);
+  }, [markets]);
 
   const signalData = signals.map((s) => ({
     name: s.signalType.toUpperCase(),
@@ -128,24 +112,20 @@ export default function Dashboard() {
           Signal Performance Overview
         </h2>
 
-        {usingFallbackData ? (
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mb-4">
-            <p className="text-yellow-800 dark:text-yellow-200 text-sm">
-              ⚠️ Using sample data - API is slow or unavailable. Showing representative metrics.
+        {!loading && usingFallbackData && (
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4">
+            <p className="text-blue-800 dark:text-blue-200 text-sm flex items-center gap-2">
+              <span className="inline-block animate-pulse">📊</span>
+              Loading real market data... Showing sample metrics.
             </p>
           </div>
-        ) : (
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            Real-time data from {markets?.length || 0} Polymarket markets
-          </p>
         )}
 
-        {loading && !usingFallbackData && signalData.length === 0 && (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-400">Loading market data...</p>
-            <p className="mt-2 text-xs text-gray-500">Will show sample data if this takes too long...</p>
-          </div>
+        {!loading && !usingFallbackData && (
+          <p className="text-sm text-green-600 dark:text-green-400 mb-4 flex items-center gap-2">
+            <span>✅</span>
+            Real-time data from {markets?.length || 0} Polymarket markets
+          </p>
         )}
 
         {signalData.length > 0 && (
