@@ -1,9 +1,15 @@
-import { getDefaultConfig } from '@rainbow-me/rainbowkit';
+import { http, createConfig } from 'wagmi';
 import { polygon, polygonAmoy } from 'wagmi/chains';
+import { injected } from 'wagmi/connectors';
 
-export const config = getDefaultConfig({
-  appName: 'PredictLearn',
-  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'c9c9d8a4e15f8c5e3b2e9f3d7c6a8b1e',
+export const config = createConfig({
   chains: [polygon, polygonAmoy],
+  connectors: [
+    injected({ target: 'metaMask' }), // MetaMask only - no WalletConnect Project ID needed
+  ],
+  transports: {
+    [polygon.id]: http(),
+    [polygonAmoy.id]: http(),
+  },
   ssr: true,
 });
