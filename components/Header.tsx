@@ -1,8 +1,13 @@
 'use client';
 
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { Suspense, useEffect } from 'react';
 
 export function Header() {
+  useEffect(() => {
+    console.log('[Header] Component mounted, ConnectButton should render');
+  }, []);
+
   return (
     <header className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-indigo-100 dark:border-gray-800 sticky top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -24,7 +29,9 @@ export function Header() {
             <a href="/" className="text-sm font-heading font-semibold text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer">
               Dashboard
             </a>
-            <ConnectButton />
+            <Suspense fallback={<div className="text-sm text-gray-500">Loading...</div>}>
+              <ConnectButton />
+            </Suspense>
           </div>
         </div>
       </div>
