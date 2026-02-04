@@ -2,16 +2,25 @@
 
 import { useState } from 'react';
 import { mockBacktestResult } from '@/lib/mockData';
-import { SignalType } from '@/types';
+import { SignalType, BacktestResult } from '@/types';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useMarkets } from '@/hooks/usePolymarket';
+import { runBacktest, getDefaultBacktestResult } from '@/lib/backtestCalculator';
 
 export default function BacktestingPlayground() {
   const [selectedSignals, setSelectedSignals] = useState<SignalType[]>(['twitter', 'whales']);
   const [condition, setCondition] = useState<'ALL' | 'ANY'>('ALL');
   const [isRunning, setIsRunning] = useState(false);
-  const [result, setResult] = useState(mockBacktestResult);
+  const [result, setResult] = useState<BacktestResult>(mockBacktestResult);
   const [timeRange, setTimeRange] = useState('6months');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [hasRun, setHasRun] = useState(false);
+
+  // Fetch closed markets for backtesting
+  const { data: markets, loading: marketsLoading } = useMarkets(
+    { limit: 200, closed: true },
+    { refreshInterval: 0, enabled: true }
+  );
 
   const availableSignals: SignalType[] = ['twitter', 'whales', 'news', 'volume'];
 
@@ -27,11 +36,30 @@ export default function BacktestingPlayground() {
     );
   };
 
-  const runBacktest = () => {
+  const handleRunBacktest = () => {
+    if (!markets || markets.length === 0) {
+      // Use mock data if no markets available
+      setResult(mockBacktestResult);
+      setHasRun(true);
+      return;
+    }
+
     setIsRunning(true);
+    setHasRun(false);
+
+    // Simulate calculation time for better UX
     setTimeout(() => {
+      const backtestResult = runBacktest(markets, {
+        signals: selectedSignals,
+        condition,
+        timeRange,
+        category: selectedCategory
+      });
+
+      setResult(backtestResult.signalsGenerated > 0 ? backtestResult : getDefaultBacktestResult());
       setIsRunning(false);
-    }, 2000);
+      setHasRun(true);
+    }, 1500);
   };
 
   const exportResults = () => {
@@ -154,7 +182,7 @@ export default function BacktestingPlayground() {
           </div>
 
           <button
-            onClick={runBacktest}
+            onClick={handleRunBacktest}
             disabled={isRunning || selectedSignals.length === 0}
             className={`w-full py-4 rounded-lg font-semibold text-lg transition-all duration-200 ${
               isRunning || selectedSignals.length === 0
@@ -164,11 +192,42 @@ export default function BacktestingPlayground() {
           >
             {isRunning ? '🔄 Running Backtest...' : '▶️ Run Backtest'}
           </button>
+
+          {marketsLoading && !hasRun && (
+            <div className="text-sm text-gray-500 dark:text-gray-400 text-center mt-2">
+              Loading historical data...
+            </div>
+          )}
+
+          {!marketsLoading && markets && markets.length === 0 && !hasRun && (
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mt-2">
+              <p className="text-yellow-800 dark:text-yellow-200 text-sm">
+                ⚠️ No historical data available. Using sample results.
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Results */}
-      {!isRunning && (
+      {!isRunning && hasRun && result.signalsGenerated === 0 && (
+        <div className="card p-6">
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">📊</div>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+              No Trades Found
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              No historical markets matched your selected signals and filters.
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Try selecting different signals, changing the category, or adjusting the condition.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {!isRunning && hasRun && result.signalsGenerated > 0 && (
         <>
           <div className="card p-6">
             <div className="flex items-center justify-between mb-4">

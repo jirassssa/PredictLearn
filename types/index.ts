@@ -58,24 +58,29 @@ export interface BacktestStrategy {
 }
 
 export interface BacktestResult {
-  strategyId: string;
+  strategyId?: string;
   signalsGenerated: number;
   profitableTrades: number;
   winRate: number;
   averageProfit: number;
+  totalProfit: number;
   bestTrade: number;
   worstTrade: number;
   sharpeRatio: number;
-  trades: BacktestTrade[];
+  trades: Trade[];
 }
 
-export interface BacktestTrade {
+export interface Trade {
   eventId: string;
   entryOdds: number;
   exitOdds: number;
   profit: number;
   timestamp: string;
+  signals?: SignalType[];
 }
+
+// Deprecated: Use Trade instead
+export type BacktestTrade = Trade;
 
 // Gamification Types
 export interface Challenge {

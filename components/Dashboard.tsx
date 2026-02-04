@@ -10,6 +10,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 export default function Dashboard() {
   const [selectedBadge, setSelectedBadge] = useState<string | null>(null);
   const [signals, setSignals] = useState<SignalPerformance[]>([]);
+  const [usingFallbackData, setUsingFallbackData] = useState(false);
 
   const { data: markets, loading, error } = useMarkets(
     { limit: 100, closed: true },
@@ -23,8 +24,30 @@ export default function Dashboard() {
     if (markets && markets.length > 0) {
       const calculatedSignals = computeSignalPerformance(markets);
       setSignals(calculatedSignals);
+      setUsingFallbackData(false);
+    } else if (error) {
+      // Use default signals as fallback when API fails
+      const calculatedSignals = computeSignalPerformance([]);
+      setSignals(calculatedSignals);
+      setUsingFallbackData(true);
     }
-  }, [markets]);
+  }, [markets, error]);
+
+  // Use fallback data after loading for too long (15 seconds)
+  useEffect(() => {
+    if (loading) {
+      const timeout = setTimeout(() => {
+        setSignals((currentSignals) => {
+          if (currentSignals.length === 0) {
+            setUsingFallbackData(true);
+            return computeSignalPerformance([]);
+          }
+          return currentSignals;
+        });
+      }, 15000);
+      return () => clearTimeout(timeout);
+    }
+  }, [loading]);
 
   const signalData = signals.map((s) => ({
     name: s.signalType.toUpperCase(),
@@ -104,25 +127,28 @@ export default function Dashboard() {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
           Signal Performance Overview
         </h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-          Real-time data from {markets?.length || 0} Polymarket markets
-        </p>
 
-        {loading && (
+        {usingFallbackData ? (
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mb-4">
+            <p className="text-yellow-800 dark:text-yellow-200 text-sm">
+              ⚠️ Using sample data - API is slow or unavailable. Showing representative metrics.
+            </p>
+          </div>
+        ) : (
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            Real-time data from {markets?.length || 0} Polymarket markets
+          </p>
+        )}
+
+        {loading && !usingFallbackData && signalData.length === 0 && (
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>
             <p className="mt-4 text-gray-600 dark:text-gray-400">Loading market data...</p>
+            <p className="mt-2 text-xs text-gray-500">Will show sample data if this takes too long...</p>
           </div>
         )}
 
-        {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-            <p className="text-red-600 dark:text-red-400 font-semibold">Error loading data:</p>
-            <p className="text-red-700 dark:text-red-300 text-sm">{error.message}</p>
-          </div>
-        )}
-
-        {!loading && !error && signalData.length > 0 && (
+        {signalData.length > 0 && (
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={signalData}>
               <CartesianGrid strokeDasharray="3 3" />

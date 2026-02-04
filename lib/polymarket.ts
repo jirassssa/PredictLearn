@@ -62,7 +62,7 @@ export async function getMarkets(params?: {
   tag?: string;
 }): Promise<PolymarketMarket[]> {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 70000); // 70s timeout
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout for better UX
 
   const searchParams = new URLSearchParams();
 
@@ -143,7 +143,7 @@ export async function getEvents(params?: {
   tag?: string;
 }): Promise<PolymarketEvent[]> {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 70000); // 70s timeout
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout for better UX
 
   const searchParams = new URLSearchParams();
 
